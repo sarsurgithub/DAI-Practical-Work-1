@@ -1,28 +1,30 @@
-package heig.vd; /**
- * ASCII Art: Basic Picocli based sample application
- * Explanation: <a href="https://picocli.info/quick-guide.html#_basic_example_asciiart">Picocli quick guide</a>
- * Source Code: <a href="https://github.com/remkop/picocli/blob/master/picocli-examples/src/main/java/picocli/examples/i18n/I18NDemo.java">GitHub</a> 
- * @author Andreas Deininger
+package heig.vd;
+/**
+ * Sources:
+ * https://www.baeldung.com/ascii-art-in-java
+ * https://docs.oracle.com/javase%2F7%2Fdocs%2Fapi%2F%2F/java/awt/Graphics.html
+ * https://www.tabnine.com/code/java/methods/java.awt.Graphics/clearRect
+ * https://picocli.info/quick-guide.html
+ *
+ * @author: Sarah Jallon with the help of chat GPT
  */
+
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
 
-import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 
-@Command(name = "ASCIIArt", version = "ASCIIArt 1.0", mixinStandardHelpOptions = true) // |1|
-public class ASCIIArt implements Runnable { // |2|
+@Command(name = "ASCIIArt", version = "ASCIIArt 1.0", mixinStandardHelpOptions = true)
+public class ASCIIArt implements Runnable {
 
-    @Option(names = { "-s", "--font-size" }, description = "Font size") // |3|
+    @Option(names = { "-s", "--font-size" }, description = "Font size")
     int fontSize = 14;
     @Parameters(paramLabel = "<inputFile", defaultValue = "./inputFile.txt",
                 description = "File to be read as an input.")
@@ -32,69 +34,60 @@ public class ASCIIArt implements Runnable { // |2|
             description = "File where the result will be written.")
     private File outputFile;
 
-
     @Override
-    public void run() { // |6|
-        //get the text from the input file
+    public void run() {
         try {
-            // Specify the path to your text file
 
-            // Create a StringBuilder to store the file content
-            StringBuilder fileContent = new StringBuilder();
-
-            // Open the file for reading using FileReader and BufferedReader
-            FileReader fileReader = new FileReader(inputFile);
+            FileReader fileReader = new FileReader(inputFile, StandardCharsets.UTF_8);
             BufferedReader bufferedReader = new BufferedReader(fileReader);
+
+            FileWriter fileWriter = new FileWriter(outputFile, StandardCharsets.UTF_8);
+            BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+
+            int width = 144, height = 32;
+
+            BufferedImage bufferedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+            Graphics graphics = bufferedImage.getGraphics();
+            Graphics2D graphics2D = (Graphics2D) graphics;
+            graphics2D.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 
             String line;
             while ((line = bufferedReader.readLine()) != null) {
-                // Append each line to the StringBuilder with a newline separator
-                fileContent.append(line).append("\n");
+                // Clear the BufferedImage for each new line of text
+                graphics.clearRect(0, 0, width, height);
+
+                // Draw the current line of text onto the BufferedImage
+                graphics2D.drawString(line, 12, 24);
+
+                // Generate ASCII art for the current line
+                StringBuilder asciiArt = new StringBuilder();
+                for (int y = 0; y < height; y++) {
+                    StringBuilder lineAscii = new StringBuilder();
+                    for (int x = 0; x < width; x++) {
+                        lineAscii.append(bufferedImage.getRGB(x, y) == -16777216 ? " " : "*");
+                    }
+                    if (!lineAscii.toString().trim().isEmpty()) {
+                        asciiArt.append(lineAscii).append("\n");
+                    }
+                }
+
+                // Write the ASCII art for the current line to the output file
+                bufferedWriter.write(asciiArt.toString());
             }
 
-            // Close the BufferedReader and FileReader
             bufferedReader.close();
             fileReader.close();
+            bufferedWriter.close();
+            fileWriter.close();
 
-            // Convert the StringBuilder to a String
-            String fileContentAsString = fileContent.toString();
-
-            //source: https://www.baeldung.com/ascii-art-in-java
-
-            //create a buffered image using integer mode as image type
-            int width = 144, height = 32;
-            BufferedImage bufferedImage = new BufferedImage(
-                    width, height,
-                    BufferedImage.TYPE_INT_RGB);
-
-            //
-            Graphics graphics = bufferedImage.getGraphics();
-            Graphics2D graphics2D = (Graphics2D) graphics;
-            graphics2D.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
-                    RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-            graphics2D.drawString(fileContentAsString, 12, 24);
-
-            for (int y = 0; y < height; y++) {
-                StringBuilder stringBuilder = new StringBuilder();
-
-                for (int x = 0; x < width; x++) {
-                    stringBuilder.append(bufferedImage.getRGB(x, y) == -16777216 ? " " : "*");
-                }
-
-                if (stringBuilder.toString().trim().isEmpty()) {
-                    continue;
-                }
-
-                System.out.println(stringBuilder);
-            }
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
     public static void main(String[] args) {
-        int exitCode = new CommandLine(new ASCIIArt()).execute(args); // |7|
-        System.exit(exitCode); // |8|
+        int exitCode = new CommandLine(new ASCIIArt()).execute(args);
+        System.exit(exitCode);
     }
 
 }

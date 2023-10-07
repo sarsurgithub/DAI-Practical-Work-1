@@ -25,7 +25,12 @@ import java.nio.charset.StandardCharsets;
 public class ASCIIArt implements Runnable {
 
     @Option(names = { "-s", "--font-size" }, description = "Font size")
-    int fontSize = 14;
+    private int fontSize = 14;
+
+    @Option(names = {"-n", "--negative"}, description = "A boolean  that is true when the ascii art should be created " +
+            "in negative")
+
+     boolean neg;
     @Parameters(paramLabel = "<inputFile", defaultValue = "./inputFile.txt",
                 description = "File to be read as an input.")
     private File inputFile;
@@ -64,7 +69,12 @@ public class ASCIIArt implements Runnable {
                 for (int y = 0; y < height; y++) {
                     StringBuilder lineAscii = new StringBuilder();
                     for (int x = 0; x < width; x++) {
-                        lineAscii.append(bufferedImage.getRGB(x, y) == -16777216 ? " " : "*");
+                        if(neg) {
+                            lineAscii.append(bufferedImage.getRGB(x, y) == -16777216 ? "*" : " ");
+                        } else {
+                            lineAscii.append(bufferedImage.getRGB(x, y) == -16777216 ? " " : "*");
+                        }
+
                     }
                     if (!lineAscii.toString().trim().isEmpty()) {
                         asciiArt.append(lineAscii).append("\n");
@@ -73,6 +83,7 @@ public class ASCIIArt implements Runnable {
 
                 // Write the ASCII art for the current line to the output file
                 bufferedWriter.write(asciiArt.toString());
+                System.out.println(asciiArt.toString());
             }
 
             bufferedReader.close();

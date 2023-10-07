@@ -30,15 +30,18 @@ public class ASCIIArt implements Runnable {
     @Option(names = {"-n", "--negative"}, description = "A boolean  that is true when the ascii art should be created " +
             "in negative")
 
-     boolean neg;
-    @Parameters(paramLabel = "<inputFile", defaultValue = "./inputFile.txt",
-                description = "File to be read as an input.")
+    boolean neg;
+    @Parameters(paramLabel = "<inputFile>", defaultValue = "./inputFile.txt",
+            description = "File to be read as an input.")
     private File inputFile;
 
-    @Parameters(paramLabel = "<outputFile", defaultValue = "./inputFile.txt",
+    @Parameters(paramLabel = "<outputFile>", defaultValue = "./inputFile.txt",
             description = "File where the result will be written.")
     private File outputFile;
 
+    @Parameters(paramLabel = "<character>", defaultValue = "*",
+            description = "Character used for the ASCII art")
+    private char c;
     @Override
     public void run() {
         try {
@@ -70,9 +73,9 @@ public class ASCIIArt implements Runnable {
                     StringBuilder lineAscii = new StringBuilder();
                     for (int x = 0; x < width; x++) {
                         if(neg) {
-                            lineAscii.append(bufferedImage.getRGB(x, y) == -16777216 ? "*" : " ");
+                            lineAscii.append(bufferedImage.getRGB(x, y) == -16777216 ? c : " ");
                         } else {
-                            lineAscii.append(bufferedImage.getRGB(x, y) == -16777216 ? " " : "*");
+                            lineAscii.append(bufferedImage.getRGB(x, y) == -16777216 ? " " : c);
                         }
 
                     }

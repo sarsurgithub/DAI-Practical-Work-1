@@ -41,4 +41,10 @@ Thumbs.db
 [Dd]esktop.ini
 
 #files created by the program
-#*.txt
+*.txt
+
+#txt files used as examples
+!./examples/inputs/*_input.txt
+!./examples/outputs/*_output.txt
+
+

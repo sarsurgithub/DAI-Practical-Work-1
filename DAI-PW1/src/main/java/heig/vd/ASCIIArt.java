@@ -9,14 +9,14 @@ package heig.vd;
  * @author: Sarah Jallon with the help of chat GPT
  */
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
 
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.RenderingHints;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -24,36 +24,51 @@ import java.nio.charset.StandardCharsets;
 @Command(name = "ASCIIArt", version = "ASCIIArt 1.0", mixinStandardHelpOptions = true)
 public class ASCIIArt implements Runnable {
 
-    @Option(names = { "-s", "--font-size" }, description = "Font size")
+    @Option(names = {"-s", "--font-size"}, description = "Font size")
     private int fontSize = 14;
 
-    @Option(names = {"-n", "--negative"}, description = "A boolean  that is true when the ascii art should be created " +
-            "in negative")
+    @Option(names = {"-n", "--negative"}, description = "Prints the ASCII art should be created in negative")
+    private boolean neg;
 
-    boolean neg;
-    @Parameters(paramLabel = "<inputFile>", defaultValue = "./inputFile.txt",
-            description = "File to be read as an input.")
+    @Parameters(paramLabel = "<inputFile>", defaultValue = "examples/inputs/single_word_input.txt",
+            description = "File to be read as an input. (default: ${DEFAULT-VALUE})")
     private File inputFile;
 
-    @Parameters(paramLabel = "<outputFile>", defaultValue = "./inputFile.txt",
-            description = "File where the result will be written.")
+    @Parameters(paramLabel = "<outputFile>", defaultValue = "examples/outputs/single_word_output.txt",
+            description = "File where the result will be written. (default: ${DEFAULT-VALUE})")
     private File outputFile;
 
     @Parameters(paramLabel = "<character>", defaultValue = "*",
-            description = "Character used for the ASCII art")
+            description = "Character used for the ASCII art (default: ${DEFAULT-VALUE})")
     private char c;
+
     @Override
     public void run() {
-        try {
 
-            FileReader fileReader = new FileReader(inputFile, StandardCharsets.UTF_8);
-            BufferedReader bufferedReader = new BufferedReader(fileReader);
+        Logger logger = LoggerFactory.getLogger(ASCIIArt.class);
 
-            FileWriter fileWriter = new FileWriter(outputFile, StandardCharsets.UTF_8);
-            BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+        logger.debug("Hello World!");
 
+
+        // Check if the input file is valid (text file)
+        if (!isValidTextFile(inputFile)) {
+            System.err.println("Error: Invalid input file. Please provide a valid text file.");
+            return;
+        }
+
+        // Check if the output file is valid (text file)
+        if (!isValidTextFile(outputFile)) {
+            System.err.println("Error: Invalid output file. Please provide a valid text file.");
+            return;
+        }
+
+        try (
+                FileReader fileReader = new FileReader(inputFile, StandardCharsets.UTF_8);
+                BufferedReader bufferedReader = new BufferedReader(fileReader);
+                FileWriter fileWriter = new FileWriter(outputFile, StandardCharsets.UTF_8);
+                BufferedWriter bufferedWriter = new BufferedWriter(fileWriter)
+        ) {
             int width = 144, height = 32;
-
             BufferedImage bufferedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
             Graphics graphics = bufferedImage.getGraphics();
             Graphics2D graphics2D = (Graphics2D) graphics;
@@ -72,12 +87,11 @@ public class ASCIIArt implements Runnable {
                 for (int y = 0; y < height; y++) {
                     StringBuilder lineAscii = new StringBuilder();
                     for (int x = 0; x < width; x++) {
-                        if(neg) {
+                        if (neg) {
                             lineAscii.append(bufferedImage.getRGB(x, y) == -16777216 ? c : " ");
                         } else {
                             lineAscii.append(bufferedImage.getRGB(x, y) == -16777216 ? " " : c);
                         }
-
                     }
                     if (!lineAscii.toString().trim().isEmpty()) {
                         asciiArt.append(lineAscii).append("\n");
@@ -86,22 +100,58 @@ public class ASCIIArt implements Runnable {
 
                 // Write the ASCII art for the current line to the output file
                 bufferedWriter.write(asciiArt.toString());
-                System.out.println(asciiArt.toString());
+                bufferedWriter.write("\n");
+                System.out.println(asciiArt);
             }
-
-            bufferedReader.close();
-            fileReader.close();
-            bufferedWriter.close();
-            fileWriter.close();
-
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private boolean isValidTextFile(File file) {
+        // Check if the file name ends with a valid text file extension
+        String fileName = file.getName().toLowerCase();
+        if (!fileName.endsWith(".txt") && !fileName.endsWith(".csv") && !fileName.endsWith(".xml")) {
+            return false;
+        }
+
+        // Optionally, you can check the content of the file to ensure it's a text file
+        try (FileInputStream inputStream = new FileInputStream(file);
+             InputStreamReader reader = new InputStreamReader(inputStream, StandardCharsets.UTF_8);
+             BufferedReader bufferedReader = new BufferedReader(reader)) {
+
+            String line;
+            int lineCount = 0;
+            while ((line = bufferedReader.readLine()) != null) {
+                // You can add more content validation logic here if needed
+                // For simplicity, we check the first few lines for non-binary content
+                if (containsBinaryData(line)) {
+                    return false;
+                }
+
+                // Limit the number of lines to check (you can adjust this as needed)
+                if (++lineCount >= 10) {
+                    break;
+                }
+            }
+        } catch (IOException e) {
+            // Handle exceptions while reading the file (e.g., file not found)
+            return false;
+        }
+
+        // If all checks pass, consider it a valid text file
+        return true;
+    }
+
+    // Helper method to check if a line contains binary data (non-text)
+    private boolean containsBinaryData(String line) {
+        // Add your binary data detection logic here
+        // For simplicity, we check for the presence of null bytes (non-printable characters)
+        return line.contains("\0");
     }
 
     public static void main(String[] args) {
         int exitCode = new CommandLine(new ASCIIArt()).execute(args);
         System.exit(exitCode);
     }
-
 }

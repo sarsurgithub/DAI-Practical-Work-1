@@ -39,3 +39,12 @@ Thumbs.db
 
 # Folder config file
 [Dd]esktop.ini
+
+#files created by the program
+*.txt
+
+#txt files used as examples
+!examples/**/*_input.txt
+!examples/**/*_output.txt
+
+

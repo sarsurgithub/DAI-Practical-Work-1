@@ -62,31 +62,34 @@ public class ASCIIArt implements Runnable {
             return;
         }
 
-        try (
-                FileReader fileReader = new FileReader(inputFile, StandardCharsets.UTF_8);
-                BufferedReader bufferedReader = new BufferedReader(fileReader);
-                FileWriter fileWriter = new FileWriter(outputFile, StandardCharsets.UTF_8);
-                BufferedWriter bufferedWriter = new BufferedWriter(fileWriter)
+        try (FileReader fileReader = new FileReader(inputFile, StandardCharsets.UTF_8);
+             BufferedReader bufferedReader = new BufferedReader(fileReader);
+             FileWriter fileWriter = new FileWriter(outputFile, StandardCharsets.UTF_8);
+             BufferedWriter bufferedWriter = new BufferedWriter(fileWriter)
         ) {
-            int width = 144, height = 32;
-            BufferedImage bufferedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-            Graphics graphics = bufferedImage.getGraphics();
-            Graphics2D graphics2D = (Graphics2D) graphics;
-            graphics2D.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-
             String line;
             while ((line = bufferedReader.readLine()) != null) {
-                // Clear the BufferedImage for each new line of text
-                graphics.clearRect(0, 0, width, height);
+                // Calculate the width required for this line based on the characters in the line
+                int lineWidth = line.length() * 10;
+                int height = 32;
+
+                // Create a BufferedImage with the calculated width and height
+                BufferedImage bufferedImage = new BufferedImage(lineWidth, height, BufferedImage.TYPE_INT_RGB);
+                Graphics graphics = bufferedImage.getGraphics();
+                Graphics2D graphics2D = (Graphics2D) graphics;
+                graphics2D.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+
+                // Clear the BufferedImage
+               // graphics.clearRect(0, 0, lineWidth, height);
 
                 // Draw the current line of text onto the BufferedImage
-                graphics2D.drawString(line, 12, 24);
+                graphics2D.drawString(line, 4, 24);
 
                 // Generate ASCII art for the current line
                 StringBuilder asciiArt = new StringBuilder();
                 for (int y = 0; y < height; y++) {
                     StringBuilder lineAscii = new StringBuilder();
-                    for (int x = 0; x < width; x++) {
+                    for (int x = 0; x < lineWidth; x++) {
                         if (neg) {
                             lineAscii.append(bufferedImage.getRGB(x, y) == -16777216 ? c : " ");
                         } else {
@@ -106,6 +109,7 @@ public class ASCIIArt implements Runnable {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
     }
 
     private boolean isValidTextFile(File file) {
@@ -143,9 +147,8 @@ public class ASCIIArt implements Runnable {
         return true;
     }
 
-    // Helper method to check if a line contains binary data (non-text)
+    //check if a line contains binary data
     private boolean containsBinaryData(String line) {
-        // Add your binary data detection logic here
         // For simplicity, we check for the presence of null bytes (non-printable characters)
         return line.contains("\0");
     }

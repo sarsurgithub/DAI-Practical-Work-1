@@ -44,7 +44,7 @@ Thumbs.db
 *.txt
 
 #txt files used as examples
-!./examples/inputs/*_input.txt
-!./examples/outputs/*_output.txt
+!examples/**/*_input.txt
+!examples/**/*_output.txt
 
 

@@ -27,20 +27,19 @@ public class ASCIIArt implements Runnable {
     @Option(names = {"-s", "--font-size"}, description = "Font size")
     private int fontSize = 14;
 
-    @Option(names = {"-n", "--negative"}, description = "A boolean that is true when the ASCII art should be created " +
-            "in negative")
+    @Option(names = {"-n", "--negative"}, description = "Prints the ASCII art should be created in negative")
     private boolean neg;
 
-    @Parameters(paramLabel = "<inputFile>", defaultValue = "./inputFile.txt",
-            description = "File to be read as an input.")
+    @Parameters(paramLabel = "<inputFile>", defaultValue = "examples/inputs/single_word_input.txt",
+            description = "File to be read as an input. (default: ${DEFAULT-VALUE})")
     private File inputFile;
 
-    @Parameters(paramLabel = "<outputFile>", defaultValue = "./inputFile.txt",
-            description = "File where the result will be written.")
+    @Parameters(paramLabel = "<outputFile>", defaultValue = "examples/outputs/single_word_output.txt",
+            description = "File where the result will be written. (default: ${DEFAULT-VALUE})")
     private File outputFile;
 
     @Parameters(paramLabel = "<character>", defaultValue = "*",
-            description = "Character used for the ASCII art")
+            description = "Character used for the ASCII art (default: ${DEFAULT-VALUE})")
     private char c;
 
     @Override

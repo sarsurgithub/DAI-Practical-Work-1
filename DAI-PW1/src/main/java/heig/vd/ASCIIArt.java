@@ -27,7 +27,7 @@ public class ASCIIArt implements Runnable {
     @Option(names = {"-s", "--font-size"}, description = "Font size")
     private int fontSize = 14;
 
-    @Option(names = {"-n", "--negative"}, description = "Prints the ASCII art should be created in negative")
+    @Option(names = {"-n", "--negative"}, description = "Prints the ASCII art in negative")
     private boolean neg;
 
     @Parameters(paramLabel = "<inputFile>", defaultValue = "examples/inputs/single_word_input.txt",
@@ -38,7 +38,7 @@ public class ASCIIArt implements Runnable {
             description = "File where the result will be written. (default: ${DEFAULT-VALUE})")
     private File outputFile;
 
-    @Parameters(paramLabel = "<character>", defaultValue = "*",
+    @Option(names = "-c", defaultValue = "*",
             description = "Character used for the ASCII art (default: ${DEFAULT-VALUE})")
     private char c;
 
@@ -104,7 +104,6 @@ public class ASCIIArt implements Runnable {
                 // Write the ASCII art for the current line to the output file
                 bufferedWriter.write(asciiArt.toString());
                 bufferedWriter.write("\n");
-                System.out.println(asciiArt);
             }
         } catch (IOException e) {
             e.printStackTrace();

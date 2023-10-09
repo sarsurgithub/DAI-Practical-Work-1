@@ -44,10 +44,14 @@ public class ASCIIArt implements Runnable {
 
     @Override
     public void run() {
+        long start = System.nanoTime();
+
+
+
 
         Logger logger = LoggerFactory.getLogger(ASCIIArt.class);
 
-        logger.debug("Hello World!");
+
 
 
         // Check if the input file is valid (text file)
@@ -107,7 +111,12 @@ public class ASCIIArt implements Runnable {
             }
         } catch (IOException e) {
             e.printStackTrace();
+            logger.debug("Failure");
         }
+
+        long end = System.nanoTime();
+        System.out.println("Elapsed time: " + (end - start) / 1000000 + "ms / " + (end - start) + "ns");
+        logger.debug("Success!");
 
     }
 
@@ -138,6 +147,8 @@ public class ASCIIArt implements Runnable {
                 }
             }
         } catch (IOException e) {
+            Logger logger = LoggerFactory.getLogger(ASCIIArt.class);
+            logger.debug("Failure");
             // Handle exceptions while reading the file (e.g., file not found)
             return false;
         }

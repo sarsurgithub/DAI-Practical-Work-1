@@ -86,8 +86,8 @@ public class ASCIIArt implements Runnable {
             String line;
             while ((line = bufferedReader.readLine()) != null) {
                 // Calculate the width required for this line based on the characters in the line
-                // the factor 10 was found after some testing
-                int lineWidth = line.length() * 10;
+                // the factor 15 was found after some testing
+                int lineWidth = line.length() * 15;
                 int height = 32;
 
                 // Create a BufferedImage

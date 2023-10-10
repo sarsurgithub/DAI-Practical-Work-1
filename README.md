@@ -6,7 +6,7 @@ The goal of this practical work was to better understand how git, github, java, 
 ## What the CLI is for
 
 The goal of this CLI is to take some text as an input via a text file. The program will then create an ASCII art based on the text found in the input file. The ASCII art will keep the exact same disposition as the text file (end of lines). Once the ASCII art is created it will be written into an output text file. Both of those files can be specified using their path, or you can simply use the default ones. 
-On top of this feature, you can choose to use some option to tweak the look of your ASCII art, for example change the character that is used, or print the ASCII art in negative. <br>
+On top of this feature, you can choose to use some option to tweak the look of your ASCII art, for example change the character that is used, or print the ASCII art in negative or choose the encoding. <br>
 ```Have fun creating some text art!```
 
 ## How to build the CLI
@@ -34,19 +34,17 @@ java -jar .\target\DAI-PW1-1.0-SNAPSHOT.jar -h
 
 This will print the following help message:
 ```
-Usage: ASCIIArt [-hnV] [-c=<c>] [-s=<fontSize>] <inputFile> <outputFile>
-      <inputFile>    File to be read as an input. (default:
-                       examples/inputs/single_word_input.txt)
-      <outputFile>   File where the result will be written. (default:
-                       examples/outputs/single_word_output.txt)
-  -c=<c>             Character used for the ASCII art (default: *)
-  -h, --help         Show this help message and exit.
-  -n, --negative     Prints the ASCII art in negative
-  -s, --font-size=<fontSize>
-                     Font size
-  -V, --version      Print version information and exit.
-
-
+Usage: ASCIIArt [-hnV] [-c=<c>] [-enc=<charsetName>] <inputFile> <outputFile>
+      <inputFile>          File to be read as an input. (default:
+                             examples/inputs/single_word_input.txt)
+      <outputFile>         File where the result will be written. (default:
+                             examples/outputs/single_word_output.txt)
+  -c=<c>                   Character used for the ASCII art (default: *)
+      -enc=<charsetName>   Encoding use to read and write in the files.
+                             (default: UTF-8)
+  -h, --help               Show this help message and exit.
+  -n, --negative           Prints the ASCII art in negative
+  -V, --version            Print version information and exit.
 ```
 
 ### Version
@@ -58,7 +56,6 @@ Used to print the version of the ASCIIArt app
 Result:
 ```
 ASCIIArt 1.0
-
 ```
 
 ### With default params
@@ -130,10 +127,53 @@ If we want any other character than the default "*" to create our ASCII art we c
    ^^^   ^^^^^^^^^   ^^^^^   ^  ^                 
  ```
 
+### Using explicit encoding
+The result using UTF-8 and a japanese string meaning DAI COURSE 大コース
+```
+        **                                                                     
+         **                                                                     
+         **                                ******                               
+    ************  ********                *******                               
+     *   **        ***  *   ***********       **                                
+         **            **    ***********     ***                                
+        ****           **                   *****                               
+        ** **         ***                  *** ***                              
+       *** ***    *******                 ***   **                              
+      ***   ****                         **     **                              
+    ***      ***                                              
+```
+
+For the same string if we use US-ASCII encoding
+```
+ ******   ******   ******   ******   ******   ******   ******   ******   ******   ******   ******   ******          
+     *    *   *    *   *    *   *    *   *    *   *    *   *    *   *    *   *    *   *    *   *    *   *    *          
+     *    *   *    *   *    *   *    *   *    *   *    *   *    *   *    *   *    *   *    *   *    *   *    *          
+     *    *   *    *   *    *   *    *   *    *   *    *   *    *   *    *   *    *   *    *   *    *   *    *          
+     *    *   *    *   *    *   *    *   *    *   *    *   *    *   *    *   *    *   *    *   *    *   *    *          
+     *    *   *    *   *    *   *    *   *    *   *    *   *    *   *    *   *    *   *    *   *    *   *    *          
+     *    *   *    *   *    *   *    *   *    *   *    *   *    *   *    *   *    *   *    *   *    *   *    *          
+     ******   ******   ******   ******   ******   ******   ******   ******   ******   ******   ******   ******  
+```
+
+If we use the japanese EUC-JP it is not working correctly because the file was not encoded in EUC-JP
+``` 
+        ***                                **  **           
+     **********                         ***********         
+     ********          ******   ******   * *** *     ****** 
+        ****     ****  *    *   *    *     *****     *    * 
+     *********** ****  *    *   *    *  ************ *    * 
+    ***********  **    *    *   *    *  ** ***       *    * 
+      ********   **    *    *   *    *     *******   *    * 
+      ********   **    *    *   *    *    ***   **   *    * 
+      ********   ****  *    *   *    *  *****   **   *    * 
+      *********  ****  ******   ******  ** *******   ****** 
+     ** ***  **                            **   **          
+```
+
  ### Using everything at once
 
  ```
- java -jar .\target\DAI-PW1-1.0-SNAPSHOT.jar examples/inputs/single_word_input.txt .\examples\outputs\single_word_output.txt -n -c ^   
+ java -jar .\target\DAI-PW1-1.0-SNAPSHOT.jar examples/inputs/single_word_input.txt .\examples\outputs\single_word_output.txt -n -c ^  -enc US-ASCII
  ```
 
  ```
